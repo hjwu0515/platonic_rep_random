@@ -167,8 +167,78 @@ def extract_lvm_features(filenames, dataset, args):
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
         gc.collect()
+        
+def extract_imagegpt_features(model_names, dataset, args):
+    """
+    Extract features from ImageGPT models.
 
+    Args:
+        model_names: list of model identifiers (e.g. ["openai/imagegpt-small"])
+        dataset: list of dicts with {'image': PIL.Image}
+        args: argparse arguments (must have output_dir, dataset, subset, batch_size, force_remake)
+    """
+    for model_name in model_names:
 
+        save_path = utils.to_feature_filename(
+            args.output_dir, args.dataset, args.subset, model_name,
+            pool=None, prompt=None, caption_idx=None,
+        )
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+        print(f"\nDataset: \t{args.dataset}")
+        print(f"Subset:  \t{args.subset}")
+        print(f"Model:   \t{model_name}")
+        print(f"Saving to:\t{save_path}")
+
+        if os.path.exists(save_path) and not args.force_remake:
+            print("File exists — skipping.")
+            continue
+
+        # Load model + processor
+        from transformers import ImageGPTImageProcessor, ImageGPTForImageClassification
+
+        processor = ImageGPTImageProcessor.from_pretrained(model_name)
+        model = ImageGPTForImageClassification.from_pretrained(
+            model_name,
+            output_hidden_states=True
+        ).cuda().eval()
+
+        param_count = sum(p.numel() for p in model.parameters())
+
+        lvm_feats = []
+
+        # Batch images
+        for i in trange(0, len(dataset), args.batch_size):
+
+            batch_images = [dataset[j]['image'] for j in range(i, i + args.batch_size)]
+            inputs = processor(batch_images, return_tensors="pt")
+
+            input_ids = inputs["input_ids"].cuda()
+
+            with torch.no_grad():
+                outputs = model(input_ids=input_ids, output_hidden_states=True)
+
+            # hidden_states: list of [B, T, D]
+            hidden = torch.stack(outputs.hidden_states)     # [L, B, T, D]
+            hidden = hidden.permute(1, 0, 2, 3).cpu()       # [B, L, T, D]
+
+            # mean over tokens → [B, L, D]
+            feats = hidden.mean(dim=2)
+
+            lvm_feats.append(feats)
+
+        # Save
+        torch.save({
+            "feats": torch.cat(lvm_feats),
+            "num_params": param_count,
+            "model": model_name,
+        }, save_path)
+
+        # Cleanup
+        del model, processor, lvm_feats
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
+        gc.collect()
 
 if __name__ == "__main__":
     
@@ -183,7 +253,7 @@ if __name__ == "__main__":
     parser.add_argument("--subset",         type=str, default="wit_1024")
     parser.add_argument("--caption_idx",    type=int, default=0)
     parser.add_argument("--modelset",       type=str, default="val", choices=["val", "test"])
-    parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "all"])
+    parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "all", "imggpt"])
     parser.add_argument("--output_dir",     type=str, default="./results/features")
     parser.add_argument("--qlora",          action="store_true")
     args = parser.parse_args()
@@ -191,7 +261,7 @@ if __name__ == "__main__":
     if args.qlora:
         print(f"QLoRA is set to True. The alignment score will be slightly off.")
 
-    llm_models, lvm_models = get_models(args.modelset, modality=args.modality)
+    llm_models, lvm_models, imggpt_models = get_models(args.modelset, modality=args.modality)
     
     # load dataset once outside    
     dataset = load_dataset(args.dataset, revision=args.subset, split='train')
@@ -203,3 +273,7 @@ if __name__ == "__main__":
     if args.modality in ["all", "vision"]:
         # extract all vision model features
         extract_lvm_features(lvm_models, dataset, args)
+        
+    if args.modality in ["all", "imggpt"]:
+        # extract all image gpt features
+        extract_imagegpt_features(imggpt_models, dataset, args)
