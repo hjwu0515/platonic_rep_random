@@ -172,7 +172,7 @@ def extract_lvm_features(filenames, dataset, args):
         gc.collect()
 
         
-def extract_imagegpt_features(model_names, dataset, args):
+def extract_imagegpt_features(model_names, dataset, args, use_all_layers=True, keep_from=1):
     """
     Extract features from ImageGPT models for platonic-rep alignment.
 
@@ -184,7 +184,6 @@ def extract_imagegpt_features(model_names, dataset, args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     for model_name in model_names:
-
         save_path = utils.to_feature_filename(
             args.output_dir, args.dataset, args.subset, model_name,
             pool=None, prompt=None, caption_idx=None,
@@ -208,14 +207,12 @@ def extract_imagegpt_features(model_names, dataset, args):
         ).to(device).eval()
 
         param_count = sum(p.numel() for p in model.parameters())
-        lvm_feats = []
+        all_batches = []
 
-        # Batch images
         n = len(dataset)
         for i in trange(0, n, args.batch_size):
-
             j_end = min(i + args.batch_size, n)
-            batch_images = [dataset[j]['image'] for j in range(i, j_end)]
+            batch_images = [dataset[j]["image"] for j in range(i, j_end)]
 
             inputs = processor(batch_images, return_tensors="pt")
             input_ids = inputs["input_ids"].to(device)
@@ -223,35 +220,45 @@ def extract_imagegpt_features(model_names, dataset, args):
             with torch.no_grad():
                 outputs = model(input_ids=input_ids, output_hidden_states=True)
 
-            # outputs.hidden_states: tuple of (num_layers+1) tensors [B, T, D]
-            last_hidden = outputs.hidden_states[-1]   # [B, T, D]
+            # outputs.hidden_states: tuple length (n_layers + 1), each [B, T, D]
+            hs = outputs.hidden_states  # tuple
 
-            # Mean over tokens → [B, D]
-            feats = last_hidden.mean(dim=1)
+            # Option 1: use all transformer layers (drop embedding layer at index 0)
+            if use_all_layers:
+                hs = hs[keep_from:]   # e.g. keep_from=1 → drop embedding, keep all blocks
 
-            # Optional: L2-normalize features (often helpful for alignment metrics)
+            # Stack → [L, B, T, D]
+            hs = torch.stack(hs, dim=0)
+
+            # Mean over tokens → [L, B, D]
+            hs = hs.mean(dim=2)
+
+            # Move batch to front → [B, L, D]
+            feats = hs.permute(1, 0, 2)
+
+            # Optional: per-layer L2 normalization
             feats = F.normalize(feats, dim=-1)
 
-            lvm_feats.append(feats.cpu())
+            all_batches.append(feats.cpu())
 
-        all_feats = torch.cat(lvm_feats, dim=0)  # [N, D]
+        # Concatenate over batches → [N, L, D]
+        all_feats = torch.cat(all_batches, dim=0)
 
-        # Save
         torch.save(
             {
-                "feats": all_feats,
+                "feats": all_feats,          # [N, L, D]
                 "num_params": param_count,
                 "model": model_name,
             },
             save_path,
         )
 
-        # Cleanup
-        del model, processor, lvm_feats, all_feats
+        del model, processor, all_batches, all_feats
         if device.type == "cuda":
             torch.cuda.empty_cache()
             torch.cuda.ipc_collect()
         gc.collect()
+
 
 
 if __name__ == "__main__":
