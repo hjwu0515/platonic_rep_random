@@ -344,6 +344,220 @@ def extract_imagegpt_features(model_names, dataset, args, use_all_layers=True, k
             torch.cuda.ipc_collect()
         gc.collect()
 
+def extract_diffusion_features(filenames, dataset, args):
+    """
+    Extract features from diffusion-based models (e.g., Stable Diffusion).
+    - filenames: list of HF diffusion model IDs (Stable Diffusion-like)
+    - dataset: huggingface dataset with images and optional captions
+    - args: argparse args (reuses same pattern)
+    Saves layer-wise features per sample with metadata.
+    """
+
+
+    # image preprocessing (resize/center-crop consistent with pipeline VAE expected size)
+    preprocess = T.Compose([
+        T.Resize((512, 512)),
+        T.ToTensor(),
+        T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ])
+
+
+    for model_name in filenames:
+        save_path = utils.to_feature_filename(args.output_dir, args.dataset, args.subset, model_name,
+                                                pool=args.pool, prompt=args.prompt, caption_idx=args.caption_idx)
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        print(f"\nProcessing diffusion model: {model_name} -> {save_path}")
+
+
+        if os.path.exists(save_path) and not args.force_remake:
+            print("file exists. skipping")
+            continue
+
+
+        # load pipeline (choose dtype to save memory)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        pipe = StableDiffusionPipeline.from_pretrained(model_name, torch_dtype=torch.float16 if device=="cuda" else torch.float32)
+        pipe = pipe.to(device)
+        pipe.safety_checker = None  # optional
+
+
+        unet = pipe.unet
+        vae = pipe.vae
+        tokenizer = getattr(pipe, "tokenizer", None)
+        text_encoder = getattr(pipe, "text_encoder", None)
+
+
+        param_count = sum(p.numel() for p in pipe.unet.parameters()) + sum(p.numel() for p in vae.parameters())
+        if text_encoder is not None:
+            param_count += sum(p.numel() for p in text_encoder.parameters())
+
+
+        # helper: register forward hooks on UNet blocks to capture activations
+        activations = {}
+        hooks = []
+
+
+        def make_hook(name):
+            def hook(module, inp, out):
+                # Some UNet blocks return tuples
+                if isinstance(out, tuple):
+                    out = out[0]  # take main feature map, ignore residuals
+
+                if isinstance(out, torch.Tensor):
+                    activations.setdefault(name, []).append(out.detach().cpu())
+            return hook
+
+
+        # Try registering hooks on down_blocks, mid_block, up_blocks if present
+        for i, block in enumerate(getattr(unet, "down_blocks", [])):
+            hooks.append(block.register_forward_hook(make_hook(f"down_{i}")))
+        if hasattr(unet, "mid_block"):
+            hooks.append(unet.mid_block.register_forward_hook(make_hook("mid")))
+        for i, block in enumerate(getattr(unet, "up_blocks", [])):
+            hooks.append(block.register_forward_hook(make_hook(f"up_{i}")))
+
+
+        diffusion_feats = []     # list per batch: dict(layer_name -> tensor)
+        meta_info = []           # store meta info (caption, timestep) per sample
+        losses = []              # optional, if you compute any loss / metric
+
+
+        # We'll process images in batches: encode with VAE to get latents, add noise for some timestep
+        pipe.scheduler.set_timesteps(50)  # example: set scheduler timesteps; adjust per model/version
+        timesteps = [10, 25, 40]         # example timesteps to probe (choose per experiment)
+
+
+        for i in trange(0, len(dataset), args.batch_size):
+            batch_images = []
+            batch_texts = []
+            end = min(i + args.batch_size, len(dataset))
+            for j in range(i, end):
+                img = dataset[j]['image']
+                batch_images.append(preprocess(img).to(device))
+                if "text" in dataset[j]:
+                    batch_texts.append(str(dataset[j]['text'][args.caption_idx]))
+                else:
+                    batch_texts.append("")
+
+
+            ims = torch.stack(batch_images)  # shape: Bx3xHxW
+
+
+            # encode images -> latents via VAE encoder
+            with torch.no_grad():
+                # VAE expects images in [-1,1], normalized above does that
+                encoded = vae.encode(ims.half() if device=="cuda" else ims).latent_dist
+                latents = encoded.sample()  # shape: B x C x h x w
+                latents = latents * vae.config.scaling_factor  # follow diffusers patterns
+
+
+            # text conditioning
+            if tokenizer is not None and text_encoder is not None:
+                text_inputs = tokenizer(batch_texts, padding=True, truncation=True, return_tensors="pt").to(device)
+                text_embeds = text_encoder(text_inputs.input_ids)[0]
+            else:
+                text_embeds = None
+
+
+            # for each chosen timestep, produce noisy latents and run UNet to capture activations
+            batch_layer_feats = { }  # will be filled layer_name -> list of tensors for this batch
+            for t in timesteps:
+                # create noise
+                noise = torch.randn_like(latents).to(device)
+                # add noise using scheduler helper if available (safer) else simple add
+                try:
+                    noisy = pipe.scheduler.add_noise(latents, noise, torch.tensor([t]*latents.shape[0], device=device))
+                except Exception:
+                    # fallback simple noise injection (not equivalent to scheduler but ok for activations probing)
+                    noisy = latents + noise
+
+
+                # run UNet forward: sample/noisy_latents, timestep, encoder_hidden_states=text_embeds
+                with torch.no_grad():
+                    # UNet forward signature: (sample, timestep, encoder_hidden_states=...)
+                    if text_embeds is not None:
+                        out = unet(noisy.half() if device=="cuda" else noisy, torch.tensor([t], device=device), encoder_hidden_states=text_embeds.half() if device=="cuda" else text_embeds)
+                    else:
+                        out = unet(noisy.half() if device=="cuda" else noisy, torch.tensor([t], device=device))
+
+
+                # after forward pass, hooks filled `activations`. collect & clear
+                # activations entries are lists (one entry per forward call) — pop last
+                for k, v_list in activations.items():
+                    last_out = v_list.pop() if v_list else None
+                    if last_out is not None:
+                        # last_out shape depends on module; typically BxCxHxW or Bx...; apply pooling as requested
+                        if args.pool == "avg":
+                            pooled = last_out.mean(dim=[-2, -1]) if last_out.ndim == 4 else last_out.mean(dim=1)
+                        elif args.pool == "cls":
+                            # if module produces sequence-like tokens, pick first token
+                            pooled = last_out[:, 0, :] if last_out.ndim == 3 else last_out.mean(dim=[-2, -1])
+                        else:
+                            pooled = last_out.view(last_out.shape[0], -1).cpu()
+                        batch_layer_feats.setdefault(k, []).append(pooled)
+
+
+            # stack and rearrange: for each layer, we have len(timesteps) pooled tensors of shape BxD → stack -> B x T x D
+            per_batch_saved = {}
+            for layer_name, pooled_list in batch_layer_feats.items():
+                # pooled_list: list of pooled per-timestep tensors: [T tensors (B x D)]
+                per_batch_saved[layer_name] = torch.stack(pooled_list, dim=1).cpu()  # B x T x D
+
+
+            diffusion_feats.append(per_batch_saved)
+            meta_info.extend([{"text": txt, "timesteps": timesteps} for txt in batch_texts])
+
+
+            # optionally clear activations dict to keep memory low
+            activations.clear()
+
+
+        # remove hooks
+        for h in hooks:
+            h.remove()
+        
+        
+        # ---- Build a single [N, L, D] tensor for alignment ----
+        layer_names = list(diffusion_feats[0].keys())
+        all_layer_feats = []
+        
+        for layer in layer_names:
+            # shape: [N, T, D]
+            per_layer = torch.cat([b[layer] for b in diffusion_feats], dim=0)
+        
+            # pool across timesteps so it becomes [N, D]
+            per_layer = per_layer.mean(dim=1)
+            all_layer_feats.append(per_layer)
+        
+        # stack layers -> [N, L, D]
+        max_dim = max(f.shape[1] for f in all_layer_feats)
+
+        padded_feats = []
+        for f in all_layer_feats:
+            if f.shape[1] < max_dim:
+                pad = torch.zeros(f.shape[0], max_dim - f.shape[1])
+                f = torch.cat([f, pad], dim=1)
+            padded_feats.append(f)
+        
+        # stack -> [N, L, D]
+        feat_tensor = torch.stack(padded_feats, dim=1)
+        
+        # ---- Save in expected format ----
+        save_dict = {
+            "feats": feat_tensor,     
+            "num_params": param_count,
+            "layers": {name: i for i, name in enumerate(layer_names)},
+            "meta": meta_info
+        }
+        
+        torch.save(save_dict, save_path)
+
+
+        # cleanup
+        del pipe, unet, vae, tokenizer, text_encoder, diffusion_feats
+        torch.cuda.empty_cache()
+        gc.collect()
+
 
 
 if __name__ == "__main__":
@@ -359,7 +573,7 @@ if __name__ == "__main__":
     parser.add_argument("--subset",         type=str, default="wit_1024")
     parser.add_argument("--caption_idx",    type=int, default=0)
     parser.add_argument("--modelset",       type=str, default="val", choices=["val", "test"])
-    parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "imggpt", "all"])
+    parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "imggpt", "diffusion", "all"])
     parser.add_argument("--output_dir",     type=str, default="./results/features")
     parser.add_argument("--qlora",          action="store_true")
     args = parser.parse_args()
@@ -367,7 +581,7 @@ if __name__ == "__main__":
     if args.qlora:
         print(f"QLoRA is set to True. The alignment score will be slightly off.")
 
-    llm_models, lvm_models, imggpt_models = get_models(args.modelset, modality=args.modality)
+    llm_models, lvm_models, imggpt_models, diffusion_models = get_models(args.modelset, modality=args.modality)
     
     # load dataset once outside    
     dataset = load_dataset(args.dataset, revision=args.subset, split='train')
@@ -383,3 +597,7 @@ if __name__ == "__main__":
     if args.modality in ["all", "imggpt"]:
         # extract all image gpt features
         extract_imagegpt_features(imggpt_models, dataset, args)
+
+    if args.modality in ["all", "diffusion"]:
+        # extract all diffusion model features
+        extract_diffusion_features(diffusion_models, dataset, args)
