@@ -3,6 +3,7 @@ import os
 import argparse
 
 from tqdm import trange
+import torch.nn.functional as F
 
 import torch
 
@@ -10,6 +11,8 @@ import timm
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
 from torchvision.models.feature_extraction import create_feature_extractor
+
+from transformers import ImageGPTImageProcessor, ImageGPTModel
 
 from datasets import load_dataset
 from tasks import get_models
@@ -167,16 +170,19 @@ def extract_lvm_features(filenames, dataset, args):
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
         gc.collect()
+
         
 def extract_imagegpt_features(model_names, dataset, args):
     """
-    Extract features from ImageGPT models.
+    Extract features from ImageGPT models for platonic-rep alignment.
 
     Args:
         model_names: list of model identifiers (e.g. ["openai/imagegpt-small"])
-        dataset: list of dicts with {'image': PIL.Image}
+        dataset: list / Dataset of dicts with {'image': PIL.Image}
         args: argparse arguments (must have output_dir, dataset, subset, batch_size, force_remake)
     """
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     for model_name in model_names:
 
         save_path = utils.to_feature_filename(
@@ -195,50 +201,58 @@ def extract_imagegpt_features(model_names, dataset, args):
             continue
 
         # Load model + processor
-        from transformers import ImageGPTImageProcessor, ImageGPTForImageClassification
-
         processor = ImageGPTImageProcessor.from_pretrained(model_name)
-        model = ImageGPTForImageClassification.from_pretrained(
+        model = ImageGPTModel.from_pretrained(
             model_name,
-            output_hidden_states=True
-        ).cuda().eval()
+            output_hidden_states=True,
+        ).to(device).eval()
 
         param_count = sum(p.numel() for p in model.parameters())
-
         lvm_feats = []
 
         # Batch images
-        for i in trange(0, len(dataset), args.batch_size):
+        n = len(dataset)
+        for i in trange(0, n, args.batch_size):
 
-            batch_images = [dataset[j]['image'] for j in range(i, i + args.batch_size)]
+            j_end = min(i + args.batch_size, n)
+            batch_images = [dataset[j]['image'] for j in range(i, j_end)]
+
             inputs = processor(batch_images, return_tensors="pt")
-
-            input_ids = inputs["input_ids"].cuda()
+            input_ids = inputs["input_ids"].to(device)
 
             with torch.no_grad():
                 outputs = model(input_ids=input_ids, output_hidden_states=True)
 
-            # hidden_states: list of [B, T, D]
-            hidden = torch.stack(outputs.hidden_states)     # [L, B, T, D]
-            hidden = hidden.permute(1, 0, 2, 3).cpu()       # [B, L, T, D]
+            # outputs.hidden_states: tuple of (num_layers+1) tensors [B, T, D]
+            last_hidden = outputs.hidden_states[-1]   # [B, T, D]
 
-            # mean over tokens → [B, L, D]
-            feats = hidden.mean(dim=2)
+            # Mean over tokens → [B, D]
+            feats = last_hidden.mean(dim=1)
 
-            lvm_feats.append(feats)
+            # Optional: L2-normalize features (often helpful for alignment metrics)
+            feats = F.normalize(feats, dim=-1)
+
+            lvm_feats.append(feats.cpu())
+
+        all_feats = torch.cat(lvm_feats, dim=0)  # [N, D]
 
         # Save
-        torch.save({
-            "feats": torch.cat(lvm_feats),
-            "num_params": param_count,
-            "model": model_name,
-        }, save_path)
+        torch.save(
+            {
+                "feats": all_feats,
+                "num_params": param_count,
+                "model": model_name,
+            },
+            save_path,
+        )
 
         # Cleanup
-        del model, processor, lvm_feats
-        torch.cuda.empty_cache()
-        torch.cuda.ipc_collect()
+        del model, processor, lvm_feats, all_feats
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()
         gc.collect()
+
 
 if __name__ == "__main__":
     
@@ -253,7 +267,7 @@ if __name__ == "__main__":
     parser.add_argument("--subset",         type=str, default="wit_1024")
     parser.add_argument("--caption_idx",    type=int, default=0)
     parser.add_argument("--modelset",       type=str, default="val", choices=["val", "test"])
-    parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "all", "imggpt"])
+    parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "imggpt", "all"])
     parser.add_argument("--output_dir",     type=str, default="./results/features")
     parser.add_argument("--qlora",          action="store_true")
     args = parser.parse_args()
