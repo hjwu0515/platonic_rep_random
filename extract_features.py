@@ -110,6 +110,7 @@ def extract_llm_features(filenames, dataset, args):
     return
     
         
+        
 def extract_lvm_features(filenames, dataset, args):
     """
     Extracts features from vision models.
@@ -151,7 +152,9 @@ def extract_lvm_features(filenames, dataset, args):
             raise NotImplementedError(f"unknown model {lvm_model_name}")
 
         vision_model = create_feature_extractor(vision_model, return_nodes=return_nodes)
-        lvm_feats = []
+        lvm_feats, losses, bpp_losses = [], [], []
+        loss_min, loss_max = float('inf'), float('-inf')
+        bpp_min, bpp_max = float('inf'), float('-inf')
 
         for i in trange(0, len(dataset), args.batch_size):
             with torch.no_grad():
@@ -163,8 +166,61 @@ def extract_lvm_features(filenames, dataset, args):
                     feats = torch.stack(feats).permute(1, 0, 2)
                     
                 lvm_feats.append(feats.cpu())
+                
+                # forward through full ViT
+                full_out = vision_model(ims)
 
-        torch.save({"feats": torch.cat(lvm_feats), "num_params": lvm_param_count}, save_path)
+                embed = None
+                if isinstance(full_out, torch.Tensor):
+                    embed = full_out
+                elif isinstance(full_out, dict):
+                    for v in full_out.values():
+                        if isinstance(v, torch.Tensor):
+                            embed = v
+                            break
+                elif hasattr(full_out, "__dict__"):
+                    for k, v in full_out.__dict__.items():
+                        if isinstance(v, torch.Tensor):
+                            embed = v
+                            break
+                if embed is None and hasattr(full_out, "sample"):
+                    embed = full_out.sample
+                if embed is None:
+                    raise ValueError(f"Could not find tensor in model output type: {type(full_out)}")  
+                    
+                if embed.ndim == 2:
+                    loss = torch.mean(embed**2, dim=1)
+                elif embed.ndim == 3:
+                    loss = torch.mean(embed**2, dim=[1, 2])
+                elif embed.ndim == 4:
+                    loss = torch.mean(embed**2, dim=[1,2,3])
+                else:
+                    print(f"Warning: unsupported embed.ndim={embed.ndim}, skipping.")
+                    continue
+                batch_min = loss.min().item()
+                batch_max = loss.max().item()
+                loss_min = min(loss_min, batch_min)
+                loss_max = max(loss_max, batch_max)
+                loss = (loss - loss_min) / (loss_max - loss_min)
+                losses.append(loss.cpu())
+
+                # compute bits per pixel
+                H, W = ims.shape[2], ims.shape[3]
+                bpp = loss / (H * W * np.log(2))
+                bpp_min = min(bpp_min, bpp.min().item())
+                bpp_max = max(bpp_max, bpp.max().item())
+                bpp_losses.append(bpp.cpu())
+
+        losses_tensor = torch.cat(losses)
+        loss_norm = (losses_tensor - loss_min) / (loss_max - loss_min + 1e-12)
+        bpp_tensor = torch.cat(bpp_losses)
+        bpp_norm = (bpp_tensor - bpp_min) / (bpp_max - bpp_min + 1e-12)
+        torch.save({
+            "feats": torch.cat(lvm_feats), 
+            "num_params": lvm_param_count,
+            "loss": loss_norm,
+            "bpp": bpp_norm
+        }, save_path)
 
         del vision_model, transform, lvm_feats, lvm_output
         torch.cuda.empty_cache()
