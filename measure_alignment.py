@@ -143,11 +143,11 @@ if __name__ == "__main__":
     parser.add_argument("--dataset",        type=str, default="prh/minhuh")
     parser.add_argument("--subset",         type=str, default="wit_1024")
 
-    parser.add_argument("--modality_x",     type=str, default="all", choices=["vision", "language", "all", "imggpt"])
+    parser.add_argument("--modality_x",     type=str, default="all", choices=["vision", "language", "all", "imggpt", "diffusion"])
     parser.add_argument("--prompt_x",       action="store_true")
     parser.add_argument("--pool_x",         type=str, default=None, choices=['avg', 'cls'])
     
-    parser.add_argument("--modality_y",     type=str, default="all", choices=["vision", "language", "all", "imggpt"])
+    parser.add_argument("--modality_y",     type=str, default="all", choices=["vision", "language", "all", "imggpt", "diffusion"])
     parser.add_argument("--prompt_y",       action="store_true")
     parser.add_argument("--pool_y",         type=str, default=None, choices=['avg', 'cls'])
 
@@ -179,10 +179,10 @@ if __name__ == "__main__":
         print(f"alignment already exists at {save_path}")
         exit()
     
-    llm_models, lvm_models, imggpt_models = get_models(args.modelset, modality='all')
+    llm_models, lvm_models, imggpt_models, diffusion_models = get_models(args.modelset, modality='all')
     # models_x = llm_models if args.modality_x == "language" else lvm_models
     # models_y = llm_models if args.modality_y == "language" else lvm_models
-    modality_to_models = {"language": llm_models, "vision": lvm_models, "imggpt": imggpt_models}
+    modality_to_models = {"language": llm_models, "vision": lvm_models, "imggpt": imggpt_models, "diffusion": diffusion_models}
     models_x = modality_to_models[args.modality_x]
     models_y = modality_to_models[args.modality_y]
     

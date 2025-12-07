@@ -2,7 +2,7 @@
 
 def get_models(modelset, modality='all'):
     
-    assert modality in ['all', 'vision', 'language', 'imggpt']
+    assert modality in ['all', 'vision', 'language', 'imggpt', 'diffusion']
     
     if modelset == 'val':
         llm_models = [
@@ -43,6 +43,8 @@ def get_models(modelset, modality='all'):
         imggpt_models = [
             "openai/imagegpt-small"
         ]
+
+        diffusion_models = ["stable-diffusion-v1-5/stable-diffusion-v1-5"]
         
     elif modelset == 'test':
         llm_models = [
@@ -60,6 +62,8 @@ def get_models(modelset, modality='all'):
         lvm_models = []
         
         imggpt_models = []
+
+        diffusion_models = []
         
     elif modelset == 'custom':
         llm_models = [
@@ -89,17 +93,25 @@ def get_models(modelset, modality='all'):
             "vit_giant_patch14_dinov2.lvd142m",
         ]
         imggpt_models = []
+        diffusion_models = ["stable-diffusion-v1-5/stable-diffusion-v1-5"]
     else:
         raise ValueError(f"Unknown modelset: {modelset}")
     
     if modality == "vision":
         llm_models = []
         imggpt_models = []
+        diffusion_models = []
     elif modality == "language":
         lvm_models = []
         imggpt_models = []
+        diffusion_models = []
     elif modality == "imggpt":
         llm_models = []
         lvm_models = []
+        diffusion_models = []
+    elif modality == "diffusion":
+        llm_models = []
+        lvm_models = []
+        imggpt_models = []
 
-    return llm_models, lvm_models, imggpt_models
+    return llm_models, lvm_models, imggpt_models, diffusion_models
