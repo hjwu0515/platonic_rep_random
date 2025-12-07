@@ -6,6 +6,8 @@ from tqdm import trange
 import torch.nn.functional as F
 
 import torch
+import math
+import numpy as np
 
 import timm
 from timm.data import resolve_data_config
@@ -263,7 +265,9 @@ def extract_imagegpt_features(model_names, dataset, args, use_all_layers=True, k
         ).to(device).eval()
 
         param_count = sum(p.numel() for p in model.parameters())
-        all_batches = []
+        all_batches, all_loss, all_bpp = [], [], []
+        loss_min, loss_max = float('inf'), float('-inf')
+        bpp_min, bpp_max = float('inf'), float('-inf')
 
         n = len(dataset)
         for i in trange(0, n, args.batch_size):
@@ -296,14 +300,39 @@ def extract_imagegpt_features(model_names, dataset, args, use_all_layers=True, k
             feats = F.normalize(feats, dim=-1)
 
             all_batches.append(feats.cpu())
+            
+            LHS = outputs.last_hidden_state
+            T = input_ids.shape[1]  # number of tokens
+            H = W = int(math.sqrt(T))
+
+            embed = LHS.mean(dim=1)
+            loss = torch.mean(embed ** 2, dim=1)
+            
+            batch_min = loss.min().item()
+            batch_max = loss.max().item()
+            loss_min = min(loss_min, batch_min)
+            loss_max = max(loss_max, batch_max)
+            loss = (loss - loss_min) / (loss_max - loss_min)
+            all_loss.append(loss.cpu())
+            
+            bpp = loss / (H * W * np.log(2))
+            bpp_min = min(bpp_min, bpp.min().item())
+            bpp_max = max(bpp_max, bpp.max().item())
+            all_bpp.append(bpp.cpu())
 
         # Concatenate over batches → [N, L, D]
         all_feats = torch.cat(all_batches, dim=0)
+        losses_tensor = torch.cat(all_loss)
+        loss_norm = (losses_tensor - loss_min) / (loss_max - loss_min + 1e-12)
+        bpp_tensor = torch.cat(all_bpp)
+        bpp_norm = (bpp_tensor - bpp_min) / (bpp_max - bpp_min + 1e-12)
 
         torch.save(
             {
                 "feats": all_feats,          # [N, L, D]
                 "num_params": param_count,
+                "loss": loss_norm,        # [N]
+                "bpp": bpp_norm,          # [N]
                 "model": model_name,
             },
             save_path,
