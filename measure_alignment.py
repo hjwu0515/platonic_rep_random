@@ -117,7 +117,7 @@ def compute_alignment(x_feat_paths, y_feat_paths, metric, topk, precise=True):
                 y_feats = prepare_features(raw_y.float(), exact=precise)
             else:
                 y_feats = [prepare_features(layer.float(), exact=precise) for layer in raw_y]
-            best_score, best_indices = compute_score(y_feats, x_feats, metric=metric, topk=topk)
+            best_score, best_indices = compute_score(x_feats, y_feats, metric=metric, topk=topk)
             
             alignment_scores[i, j] = best_score
             alignment_indices[i, j] = best_indices
