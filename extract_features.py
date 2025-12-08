@@ -15,16 +15,14 @@ from timm.data.transforms_factory import create_transform
 from torchvision.models.feature_extraction import create_feature_extractor
 
 from transformers import ImageGPTImageProcessor, ImageGPTModel
+from diffusers import StableDiffusionPipeline
+from transformers import CLIPTokenizer, CLIPTextModel  # optional, pipeline provides these
+import torchvision.transforms as T
 
 from datasets import load_dataset
 from tasks import get_models
 from models import load_llm, load_tokenizer
 import utils 
-
-
-from diffusers import StableDiffusionPipeline
-from transformers import CLIPTokenizer, CLIPTextModel  # optional, pipeline provides these
-import torchvision.transforms as T
     
 
 def extract_llm_features(filenames, dataset, args):
@@ -225,8 +223,8 @@ def extract_lvm_features(filenames, dataset, args):
         torch.save({
             "feats": torch.cat(lvm_feats), 
             "num_params": lvm_param_count,
-            "loss": loss_norm,
-            "bpp": bpp_norm
+            "loss": loss_norm.mean() * 10,
+            "bpp": bpp_norm.mean() * 10,
         }, save_path)
 
         del vision_model, transform, lvm_feats, lvm_output
@@ -336,8 +334,8 @@ def extract_imagegpt_features(model_names, dataset, args, use_all_layers=True, k
             {
                 "feats": all_feats,          # [N, L, D]
                 "num_params": param_count,
-                "loss": loss_norm,        # [N]
-                "bpp": bpp_norm,          # [N]
+                "loss": loss_norm.mean() * 10,        # [N]
+                "bpp": bpp_norm.mean() * 10,          # [N]
                 "model": model_name,
             },
             save_path,
@@ -515,22 +513,6 @@ def extract_diffusion_features(filenames, dataset, args):
 
             # optionally clear activations dict to keep memory low
             activations.clear()
-        
-        losses_tensor = torch.cat(losses)  # shape [N]
-        # normalize loss
-        loss_norm = (losses_tensor - loss_min) / (loss_max - loss_min + 1e-12)
-
-        # latent spatial size
-        H, W = latents.shape[-2], latents.shape[-1]
-
-        # compute bpp
-        bpp = loss_norm / (H * W * math.log(2))
-
-        # normalize bpp
-        bpp_min = bpp.min().item()
-        bpp_max = bpp.max().item()
-        bpp_norm = (bpp - bpp_min) / (bpp_max - bpp_min + 1e-12)
-
 
 
         # remove hooks
