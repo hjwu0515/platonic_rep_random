@@ -50,7 +50,7 @@
 		.margin-left-block {
 		font-size: 14px;
 		width: 20%; /* Change this percentage as needed */
-		max-width: 130px; /* Optional: Maximum width */
+		max-width: 200px; /* Optional: Maximum width */
 		position: relative;
 		margin-left: 10px;
 		text-align: left;
@@ -64,7 +64,7 @@
 			Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
 		font-size: 14px;
 		width: 20%; /* Change this percentage as needed */
-		max-width: 256px; /* Optional: Maximum width */
+		max-width: 186px; /* Optional: Maximum width */
 		position: relative;
 		text-align: left;
 		padding: 10px; /* Optional: Adds padding inside the caption */
@@ -326,7 +326,7 @@
         </p>
 
         <p>
-          In this paper, we argue that the Platonic Representation Hypothesis holds true for reasonably well-performing models, independent of modality and architecture, and find evidence of latent representation convergence through layer-level analysis. To mathematically quantify this convergence across different models, we will first formalize a few key concepts. Following Huh et al., 2024, we define the representation as a function that maps an input to a feature vector. A kernel is a matrix that describes how a representation computes pairwise similarity between datapoints: each row and column corresponds to a datapoint, with the pairwise similarity between a row and column’s datapoint stored in the corresponding matrix entry. A kernel alignment metric measures the similarity between two kernels. In our analysis, we use the mutual nearest neighbor metric to determine the similarity between the representation spaces of different models.
+          In this paper, we argue that the Platonic Representation Hypothesis holds true for reasonably well-performing models, independent of modality and architecture, and find evidence of latent representation convergence through layer-level analysis. To mathematically quantify this convergence across different models, we will first formalize a few key concepts. Following Huh et al., 2024, we define the <i>representation</i> as a function that maps an input to a feature vector. A <i>kernel</i> is a matrix that describes how a representation computes pairwise similarity between datapoints: each row and column corresponds to a datapoint, with the pairwise similarity between a row and column’s datapoint stored in the corresponding matrix entry. A <i>kernel alignment metric</i> measures the similarity between two kernels. In our analysis, we use the mutual nearest neighbor metric to determine the similarity between the representation spaces of different models.
         </p>
 
         <p>
@@ -370,24 +370,54 @@
         </p>
 
 		<div class="img-row">
-			<img src="./images/langperf_dinoalign.png" />
-			<img src="./images/lang_vs_alignment_CLIP.png" />
+			<figure style="text-align:center;">
+				<img src="./images/langperf_dinoalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 1: DINOv2 Alignment vs LLM Performance
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/lang_vs_alignment_CLIP.png" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 2: CLIP Alignment vs LLM Performance 
+				</figcaption>
+			</figure>
 		</div>
 
 		<div class="img-row">
-			<img src="./images/lang_vs_alignment_MAE.png" />
-			<img src="./images/langperf_gptalign.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/lang_vs_alignment_MAE.png" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 3: MAE Alignment vs LLM Performance 
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/langperf_gptalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 4: ImageGPT Alignment vs LLM Performance 
+				</figcaption>
+			</figure>
 		</div>
 
 		<div class="img-center">
-			<img src="./images/lang_vs_alignment_diffusion.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/lang_vs_alignment_diffusion.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 5: Diffusion Alignment vs LLM Performance 
+				</figcaption>
+			</figure>
 		</div>
 
         <p>
           We also plotted ViT alignment to the language model LLaMA-13B (Touvron et al. (2023)) across ViT performance. We found a strong correlation between model alignment and vision performance.
         </p>
 
-        <img src="./images/vis_performance_vs_alignment_gpt.png" width="512px" />
+		<figure style="text-align:center;">
+			<img src="./images/visionperf_langalign.png" width="600px" />
+			<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+				Figure 6: LLM Alignment vs ViT Performance 
+			</figcaption>
+		</figure>
 
         <p>
           We confirmed and expanded upon the discoveries of previous works, showing that there is strong representational similarity between language and vision models. Figures 1-5 demonstrate that higher performing LLMs have a stronger alignment with various types of vision models. This indicates that better language models develop representations that align better with visual features and that these representations are more abstract and generalizable. We found that this holds true for different types of image models, independent of architectural and training differences. We also found that the inverse is true, as seen in Figure 6, where ViT alignment to LLaMA-13B increases as vision model performance increases. This indicates that higher performing vision encoders learn representations that align well with LLM representations. These results demonstrate that better LLMs align to DINOv2 and better ViTs align to LLaMA-13B, providing evidence that domain-general representations arise from high performing models despite the lack of cross-modal training. This supports the Platonic Representation Hypothesis by demonstrating that models learn representation spaces which converge independent of modality.
@@ -437,22 +467,37 @@
         <h2>Results</h2>
 
         <p>
-          In the graph below, we observe that ViT alignment scores to diffusion models increase as their bpp performance increases. This remains consistent with the findings from Huh et al. (2024) where LLM models with higher language performance scores also had higher alignment scores with ViT model DINOv2, suggesting that models do indeed converge toward a more accurate representation of reality.
+          In Figure 7, we observe that ViT alignment scores to diffusion models increase as their bpp performance increases. This remains consistent with the findings from Huh et al. (2024) where LLM models with higher language performance scores also had higher alignment scores with ViT model DINOv2, suggesting that models do indeed converge toward a more accurate representation of reality.
         </p>
 
-        <img src="./images/vit_performance_vs_alignment_diffusion.png" width="512px" />
+		<figure style="text-align:center;">
+			<img src="./images/vit_performance_vs_alignment_diffusion.png" width="512px" />
+			<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+				Figure 7: Diffusion Alignment vs ViT Performance 
+			</figcaption>
+		</figure>
 
 		<p>
-			However, in this second graph displayed below, we observe the inverse relationship, where the alignment score between ImageGPT and diffusion models decreased as ImageGPT performance increased. Although this was an unexpected result, we do notice how the alignment scores between diffusion and ImageGPT models were higher for larger ImageGPT models than smaller models, which remains consistent with the findings from Huh et al. (2024).
+			However, in Figure 8, we observe the inverse relationship, where the alignment score between ImageGPT and diffusion models decreased as ImageGPT performance increased. Although this was an unexpected result, we do notice how the alignment scores between diffusion and ImageGPT models were higher for larger ImageGPT models than smaller models, which remains consistent with the findings from Huh et al. (2024).
 		</p>
 
-		<img src="./images/imggpt_performance_vs_alignment_diffusion.png" width="512px" />
+		<figure style="text-align:center;">
+			<img src="./images/imggpt_performance_vs_alignment_diffusion.png" width="512px" />
+			<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+				Figure 8: Diffusion Alignment vs ImageGPT Performance 
+			</figcaption>
+		</figure>
 		
 		<p>
-			In the final graph, we observe nearly zero correlation between the performance scores of the ViT models and their alignment to the ImageGPT models. While this result was also unexpected and inconsistent with the findings from Huh et al. (2024), similar to the second graph, we observe that alignment scores are higher with larger ImageGPT models. Thus, we still find that larger models show more convergence. 
+			In Figure 9, we observe nearly zero correlation between the performance scores of the ViT models and their alignment to the ImageGPT models. While this result was also unexpected and inconsistent with the findings from Huh et al. (2024), similar to the second graph, we observe that alignment scores are higher with larger ImageGPT models. Thus, we still find that larger models show more convergence. 
 		</p>
 
-		<img src="./images/imggpt_performance_vs_alignment_vit.png" width="512px" />
+		<figure style="text-align:center;">
+			<img src="./images/vis_performance_vs_alignment_gpt.png" width="512px" />
+			<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+				Figure 9: ImageGPT Alignment vs ViT Performance 
+			</figcaption>
+		</figure>
 
 		<h2>Discussion</h2>
 
@@ -508,8 +553,18 @@
 		</p>
 
 		<div class="img-row">
-			<img src="./images/vitlayer_dinoalign_ind.png" width="512px" />
-			<img src="./images/vitlayer_dinoalign.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/vitlayer_dinoalign_ind.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 10: DINOv2 Alignment Index vs ViT Layer
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/vitlayer_dinoalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 11: DINOv2 Alignment Score vs ViT Layer
+				</figcaption>
+			</figure>
 		</div>
 
 		<h3>Across Different Vision Architectures</h3>
@@ -527,8 +582,18 @@
 		</p>
 
 		<div class="img-row">
-			<img src="./images/vitlayer_gptalign_ind.png" width="512px" />
-			<img src="./images/vitlayer_gptalign.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/vitlayer_gptalign_ind.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 12: ImageGPT Alignment Index vs ViT Layer
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/vitlayer_gptalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 13: ImageGPT Alignment Score vs ViT Layer
+				</figcaption>
+			</figure>
 		</div>
 
 		<h3>Across Different Modalities</h3>
@@ -538,17 +603,37 @@
 		</p>
 
 		<div class="img-row">
-			<img src="./images/llmlayer_dinoalign_ind.png" width="512px" />
-			<img src="./images/llmlayer_dinoalign.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/llmlayer_dinoalign_ind.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 14: DINOv2 Alignment Index vs LLM Layer
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/llmlayer_dinoalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 15: DINOv2 Alignment Score vs LLM Layer
+				</figcaption>
+			</figure>
 		</div>
 
 		<p>
-			Comparing ImageGPT-large layers with LLM layers shows similar patterns of increasing alignment across layers with a slight decrease in the last layer, although overall magnitude of alignment is much lower than when comparing DINOv2 and LLM layers. However, all LLM layers align best with a middle layer (layer 20) of the ImageGPT-large model – which, as seen in the previous section, is also the layer that ViT layers most strongly align with. This differs from the DINOv2 and LLM layer alignment results, where all LLM layers instead are aligned to late layers of DINOv2. 
+			Comparing ImageGPT-large layers with LLM layers shows similar patterns of increasing alignment across layers with a slight decrease in the last layer, although overall magnitude of alignment is much lower than when comparing DINOv2 and LLM layers. However, all LLM layers align best with a <i>middle</i> layer (layer 20) of the ImageGPT-large model – which, as seen in the previous section, is also the layer that ViT layers most strongly align with. This differs from the DINOv2 and LLM layer alignment results, where all LLM layers instead are aligned to <i>late</i> layers of DINOv2. 
 		</p>
 
 		<div class="img-row">
-			<img src="./images/llmlayer_gptalign_ind.png" width="512px" />
-			<img src="./images/llmlayer_gptalign.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/llmlayer_gptalign_ind.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 16: ImageGPT Alignment Index vs LLM Layer
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/llmlayer_gptalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 17: ImageGPT Alignment Score vs LLM Layer
+				</figcaption>
+			</figure>
 		</div>
 
 		<p>
@@ -556,8 +641,18 @@
 		</p>
 
 		<div class="img-row">
-			<img src="./images/vitlayer_llamaalign_ind.png" width="512px" />
-			<img src="./images/vitlayer_llamaalign.png" width="512px" />
+			<figure style="text-align:center;">
+				<img src="./images/vitlayer_llamaalign_ind.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 18: LLaMA-13B Alignment Index vs ViT Layer
+				</figcaption>
+			</figure>
+			<figure style="text-align:center;">
+				<img src="./images/vitlayer_llamaalign.png" width="512px" />
+				<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+					Figure 19: LLaMA-13B Alignment Score vs ViT Layer
+				</figcaption>
+			</figure>
 		</div>
 
 		<p>
@@ -575,10 +670,15 @@
 		</p>
 
 		<p>
-			Our analyses above suggest that representations move closer or farther from a platonic representation as they pass through layers. Figure XX is a simplified hypothesis of how our tested models may be moving in relation to a platonic representation (PR). Since both ViTs and LLMs are always moving closer to PR, the best aligning layer for all layers of a model is the last layer of the opposing model, and layer alignment scores increase with depth. As layer 20 of image-GPT is its closest to PR, all layers of ViT and LLM models align best to it, with alignment scores increasing or plateauing with layer depth. 
+			Our analyses above suggest that representations move closer or farther from a platonic representation as they pass through layers. Figure 20 is a simplified hypothesis of how our tested models may be moving in relation to a platonic representation (PR). Since both ViTs and LLMs are always moving closer to PR, the best aligning layer for all layers of a model is the last layer of the opposing model, and layer alignment scores increase with depth. As layer 20 of image-GPT is its closest to PR, all layers of ViT and LLM models align best to it, with alignment scores increasing or plateauing with layer depth. 
 		</p>
 
-		<img src="./images/Layer hypothesis diagram.png" width="512px" />
+		<figure style="text-align:center;">
+			<img src="./images/Layer hypothesis diagram.png" width="512px" />
+			<figcaption style="font-size:14px; color:#555; margin-top:6px;">
+				Figure 20: Layer Hypothesis Diagram
+			</figcaption>
+		</figure>
       </div>
 
       <div class="margin-right-block"></div>
