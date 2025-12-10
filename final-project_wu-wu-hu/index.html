@@ -1,0 +1,346 @@
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<link rel="shortcut icon" href="images/icon.ico">
+<style type="text/css">
+	body {
+		background-color: #f5f9ff;
+	}
+
+	/* Hide both math displays initially, will display based on JS detection */
+  .mathjax-mobile, .mathml-non-mobile { display: none; }
+
+  /* Show the MathML content by default on non-mobile devices */
+  .show-mathml .mathml-non-mobile { display: block; }
+  .show-mathjax .mathjax-mobile { display: block; }
+
+	.content-margin-container {
+		display: flex;
+		width: 100%; /* Ensure the container is full width */
+		justify-content: left; /* Horizontally centers the children in the container */
+		align-items: center;  /* Vertically centers the children in the container */
+	}
+	.main-content-block {
+		width: 70%; /* Change this percentage as needed */
+    max-width: 1100px; /* Optional: Maximum width */
+		background-color: #fff;
+		border-left: 1px solid #DDD;
+		border-right: 1px solid #DDD;
+		padding: 8px 8px 8px 8px;
+		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
+	}
+	.margin-left-block {
+			font-size: 14px;
+			width: 15%; /* Change this percentage as needed */
+			max-width: 130px; /* Optional: Maximum width */
+			position: relative;
+			margin-left: 10px;
+			text-align: left;
+			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
+			padding: 5px;
+	}
+	.margin-right-block {
+			font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
+			font-size: 14px;
+			width: 25%; /* Change this percentage as needed */
+			max-width: 256px; /* Optional: Maximum width */
+			position: relative;
+			text-align: left;
+			padding: 10px;  /* Optional: Adds padding inside the caption */
+	}
+
+	img {
+			max-width: 100%; /* Make sure it fits inside the container */
+			height: auto;
+			display: block;
+			margin: auto;
+	}
+	.my-video {
+			max-width: 100%; /* Make sure it fits inside the container */
+			height: auto;
+			display: block;
+			margin: auto;
+	}
+	/* Hide both video displays initially, will display based on JS detection */
+  .vid-mobile, .vid-non-mobile { display: none; }
+
+  /* Show the video content by default on non-mobile devices */
+  .show-vid-mobile .vid-mobile { display: block; }
+  .show-vid-non-mobile .vid-non-mobile { display: block; }
+
+	a:link,a:visited
+	{
+		color: #0e7862; /*#1367a7;*/
+		text-decoration: none;
+	}
+	a:hover {
+		color: #24b597; /*#208799;*/
+	}
+
+	h1 {
+		font-size: 18px;
+		margin-top: 4px;
+		margin-bottom: 10px;
+	}
+
+	table.header {
+    font-weight: 300;
+    font-size: 17px;
+    flex-grow: 1;
+		width: 70%;
+    max-width: calc(100% - 290px); /* Adjust according to the width of .paper-code-tab */
+	}
+	table td, table td * {
+	    vertical-align: middle;
+	    position: relative;
+	}
+	table.paper-code-tab {
+	    flex-shrink: 0;
+	    margin-left: 8px;
+	    margin-top: 8px;
+	    padding: 0px 0px 0px 8px;
+	    width: 290px;
+	    height: 150px;
+	}
+
+	.layered-paper { /* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
+		box-shadow:
+		        0px 0px 1px 1px rgba(0,0,0,0.35), /* The top layer shadow */
+		        5px 5px 0 0px #fff, /* The second layer */
+		        5px 5px 1px 1px rgba(0,0,0,0.35), /* The second layer shadow */
+		        10px 10px 0 0px #fff, /* The third layer */
+		        10px 10px 1px 1px rgba(0,0,0,0.35); /* The third layer shadow */
+		margin-top: 5px;
+		margin-left: 10px;
+		margin-right: 30px;
+		margin-bottom: 5px;
+	}
+
+	hr {
+    height: 1px; /* Sets the height of the line to 1 pixel */
+    border: none; /* Removes the default border */
+    background-color: #DDD; /* Sets the line color to black */
+  }
+
+	div.hypothesis {
+		width: 80%;
+		background-color: #EEE;
+		border: 1px solid black;
+		border-radius: 10px;
+		-moz-border-radius: 10px;
+		-webkit-border-radius: 10px;
+		font-family: Courier;
+		font-size: 18px;
+		text-align: center;
+		margin: auto;
+		padding: 16px 16px 16px 16px;
+	}
+
+	div.citation {
+    font-size: 0.8em;
+    background-color:#fff;
+    padding: 10px;
+		height: 200px;
+  }
+
+	.fade-in-inline {
+		position: absolute;
+		text-align: center;
+		margin: auto;
+		-webkit-mask-image: linear-gradient(to right,
+			transparent 0%,
+			transparent 40%,
+			black 50%,
+			black 90%,
+			transparent 100%);
+		mask-image: linear-gradient(to right,
+			transparent 0%,
+			transparent 40%,
+			black 50%,
+			black 90%,
+			transparent 100%);
+		-webkit-mask-size: 8000% 100%;
+		mask-size: 8000% 100%;
+		animation-name: sweepMask;
+		animation-duration: 4s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+		animation-delay: -1s;
+	}
+
+	.fade-in2-inline {
+			animation-delay: 1s;
+	}
+
+	.inline-div {
+			position: relative;
+	    display: inline-block; /* Makes both the div and paragraph inline-block elements */
+	    vertical-align: top; /* Aligns them at the top, you can adjust this to middle, bottom, etc., based on your needs */
+	    width: 50px; /* Optional: Adds space between the div and the paragraph */
+	}
+
+</style>
+
+	  <title>The Platonic Representation Hypothesis</title>
+      <meta property="og:title" content="The Platonic Representation Hypothesis" />
+			<meta charset="UTF-8">
+  </head>
+
+  <body>
+
+		<div class="content-margin-container">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+						<table class="header" align=left>
+								<tr>
+									<td colspan=4>
+										<span style="font-size: 32px; font-family: 'Courier New', Courier, monospace; /* Adds fallbacks */">
+											Representational Convergence Across Modality, Architecture, and Layers
+										</span>
+									</td>
+								</tr>
+								<tr>
+										<td align=left>
+												<span style="font-size:17px"><a href="your_website">Hannah Wu</a></span>
+										</td>
+										<td align=left>
+												<span style="font-size:17px"><a href="your_partner's_website">Maggie Wu</a></span>
+										</td>
+										<td align=left>
+												<span style="font-size:17px"><a href="your_partner's_website">Grace Hu</a></span>
+										</td>
+								<tr>
+									<td colspan=4 align=left><span style="font-size:18px">Final project for 6.7960, MIT</span></td>
+								</tr>
+						</table>
+					</div>
+					<div class="margin-right-block">
+					</div>
+		</div>
+
+		<div class="content-margin-container" id="intro">
+				<div class="margin-left-block">
+          <!-- table of contents here -->
+          <div style="position:fixed; max-width:inherit; top:max(20%,120px)">
+              <b style="font-size:16px">Outline</b><br><br>
+			  <a href="#intro">Introduction and Background</a><br><br>
+              <a href="#modalities">Representational Similarity Across Modalities</a><br><br>
+			  <a href="#architectures">Representational Similarity Across Architectures</a><br><br>
+			  <a href="#layers">Representational Similarity Across Layers</a><br><br>
+              <a href="#conclusion">Conclusion</a><br><br>
+          </div>
+				</div>
+		    <div class="main-content-block">
+            <!--You can embed an image like this:-->
+            <img src="./images/your_image_here.png" width=512px/>
+		    </div>
+		    <div class="margin-right-block">
+						Caption for the image.
+		    </div>
+		</div>
+
+    <div class="content-margin-container" id="intro">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+				<h1>Introduction and Background</h1>
+<p>Recent advances across language, vision, and multimodal models suggest that modern AI systems may be converging toward increasingly similar internal representations. Huh et al. (2024) introduced the Platonic Representation Hypothesis, which proposes that neural networks with different architectures trained with different objectives on different data and modalities develop latent representations that converge to a shared model of reality. However, Huh et al. (2024) only examined the Platonic Representation Hypothesis for one class of language and one class of vision models.</p>
+ 
+
+<p>In this paper, we argue that the Platonic Representation Hypothesis holds true for reasonably well-performing models, independent of modality and architecture, and find evidence of latent representation convergence through layer-level analysis. To mathematically quantify this convergence across different models, we will first formalize a few key concepts. Following Huh et al., 2024, we define the representation as a function that maps an input to a feature vector. A kernel is a matrix that describes how a representation computes pairwise similarity between datapoints: each row and column corresponds to a datapoint, with the pairwise similarity between a row and column’s datapoint stored in the corresponding matrix entry. A kernel alignment metric measures the similarity between two kernels. In our analysis, we use the mutual nearest neighbor metric to determine the similarity between the representation spaces of different models. </p>
+
+<p>We will explore the representational similarity and kernel alignment across modalities, architectures, and within layers of a model.</p>
+
+		    </div>
+		    <div class="margin-right-block">
+		    </div>
+		</div>
+
+		<div class="content-margin-container" id="modalities">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+					<h1>Representational Similarity Across Modalities</h1>
+					<h2>Hypothesis and Motivation</h2>
+				<p>Previous works  show that the representation space of models converges across different modalities. He et al. (2025) demonstrated that independently trained vision-only and language-only models project inputs into a partially aligned representational space. Merullo et al. (2022) found that a vision model could be stitched to an LLM with a single linear projection at an intermediate layer and still maintain high performance on visual tasks. This indicates that vision and language models share a similar representation space despite being trained on different data modalities. 
+</p>
+<p>In Huh et al. (2024), they measured the alignment between a suite of vision and language models. They used the Wikipedia caption dataset (WIT) which pairs images with text captions and trained the vision and language models on these datasets. Then they determined the kernel for each of the types of models and found the kernel alignment using the mutual nearest neighbors metric. They found that the alignment between various LLMs and DINOv2 (a vision transformer) increases as LLM performance on various tasks increases. This indicates that higher performing LLMs develop representations that are compatible with vision models. However, this paper only discusses the alignment between LLMs and Vision Transformers (ViT), which raises the question – is cross-modality representational similarity only preserved when comparing LLMs with ViTs? In addition, the paper does not address the inverse – do better performing vision models develop a representation space that generalizes well to LLMs? We want to explore some of the limitations of this paper.
+</p>
+
+<h2>Methods</h2>
+<p>To determine if there is a positive correlation between cross-modality alignment and LLM performance, we trained various ViTs (DINOv2, CLIP, MAE, and AugReg) and generative image models (ImageGPT and Stable Diffusion) on the WIT dataset. We calculated the kernels for each of the language and vision models and found all pairwise alignment scores between each of the vision models and the LLMs using the nearest mutual neighbor metric. We used 1 – bits-per-byte to calculate the performance of the LLMs, replicating Huh et al. (2024).</p>
+<p>We also wanted to determine if there is a positive correlation between cross-modality alignment and vision model performance. We used the same process as described above to calculate cross-modality alignment. Similarly to the LLM performance metric in the Huh et al. (2024) paper, we determined the average bits-per-pixel (bpp) for all the vision models and used the same metric (1 – bpp) to score the performance of each.
+</p>
+
+<h2>Results</h2>
+<p>First, we replicated the results of the Huh et al. (2024) paper and confirmed that the alignment from LLMs to DINOv2 increases as the performance of the LLMs increases. We also plotted the alignment from LLMs to non-ViT vision models, against the performance of LLMs, and found that this correlation pattern is consistent.</p>
+
+<img src="./images/langperf_dinoalign.png" width=512px/>
+<img src="./images/lang_vs_alignment_CLIP.png" width=512px/>
+<img src="./images/lang_vs_alignment_MAE.png" width=512px/>
+<img src="./images/langperf_gptalign.png" width=512px/>
+<img src="./images/lang_vs_alignment_diffusion.png" width=512px/>
+
+<p>We also plotted ViT alignment to the language model LLaMA-13B (Touvron et al. (2023)) across ViT performance. We found a strong correlation between model alignment and vision performance.</p>
+<img src="./images/vis_performance_vs_alignment_gpt.png" width=512px/>
+
+<p>We confirmed and expanded upon the discoveries of previous works, showing that there is strong representational similarity between language and vision models. Figures 1-5 demonstrate that higher performing LLMs have a stronger alignment with various types of vision models. This indicates that better language models develop representations that align better with visual features and that these representations are more abstract and generalizable. We found that this holds true for different types of image models, independent of architectural and training differences. We also found that the inverse is true, as seen in Figure 6, where ViT alignment to LLaMA-13B increases as vision model performance increases. This indicates that higher performing vision encoders learn representations that align well with LLM representations. These results demonstrate that better LLMs align to DINOv2 and better ViTs align to LLaMA-13B, providing evidence that domain-general representations arise from high performing models despite the lack of cross-modal training. This supports the Platonic Representation Hypothesis by demonstrating that models learn representation spaces which converge independent of modality.</p>
+
+<h2>Discussion</h2>
+<p>We observe above that vision models also perform better when they are more aligned with language models. This insight may be explained by the shift from models which focus solely on low-level features in the input to those that capture high-level features as well. For language models, this would mean moving beyond local token frequency to also capture events, relations, etc. For vision models, this entails object identity, spatial layout, etc. instead of just edges and textures. This also supports the Simplicity Bias Hypothesis discussed in Huh et al. (2024), suggesting that deep neural networks exhibit an inductive bias toward simple solutions, and this bias becomes stronger as model size increases. This bias may drive the convergence of the models’ representations.</p>
+
+		    </div>
+		</div>
+
+		<div class="content-margin-container" id="architectures">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+            <h1>Representational Similarity Across Architectures</h1>
+<h2>Hypothesis and Motivation</h2>
+<p>Since Huh et al. (2024) only demonstrated converging representations in LLMs and ViTs, we wanted to determine if this pattern would generalize to different model architectures. Prior work has shown mixed results: Raghu et al. (2021) compared ViTs and CNNs and found substantial differences in representation, while Wallin (2022) concluded that image-trained classification networks and Generative Adversarial Networks (GANs) learn very similar internal representations. Motivated by the inconsistency in these results and the findings in Huh et al. (2024), we decided to test a wider variety of image model architectures  to determine if representational convergence generalizes to other vision models</p>
+<p>We chose two generative image model architectures: ImageGPT and diffusion models. Like ViTs, ImageGPT models also use transformers as building blocks in their architecture; however, ImageGPT models typically use an autoregressive decoder not usually present in ViTs. Diffusion models differ even more from ViTs and ImageGPT, as diffusion models employ noising and de-noising to learn features and generate content. </p>
+
+<h2>Methods</h2>
+<p>For the diffusion model, we attach forward hooks to internal layers of the diffusion model’s UNet so that we can capture the hidden activations during a forward pass. These hooks act as listeners that record intermediate feature representations without modifying the model’s behavior. The feature extraction was done primarily in the denoising phase where the model is actively learning the representations of the input. 
+</p>
+<p>For the ImageGPT models, as we ran images through the models, we recorded the hidden representations from each transformer layer and pooled them into vectors. </p>
+<p>With these internal representations from the models, we were able to generate the alignment scores amongst them. </p>
+
+<h2>Results</h2>
+<p>In the graph below, we observe that ViT alignment scores to diffusion models increase as their bpp performance increases. This remains consistent with the findings from Huh et al. (2024) where LLM models with higher language performance scores also had higher alignment scores with ViT model DINOv2, suggesting that models do indeed converge toward a more accurate representation of reality. </p>
+<img src="./images/vit_performance_vs_alignment_diffusion.png" width=512px/>
+		</div>
+
+		<div class="content-margin-container" id="implications_and_limitations">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+						<h1>Implications and limitations</h1>
+						Let's end with some discussion of the implications and limitations.
+		    </div>
+		    <div class="margin-right-block">
+		    </div>
+		</div>
+
+		<div class="content-margin-container" id="citations">
+				<div class="margin-left-block">
+				</div>
+		    <div class="main-content-block">
+						<div class='citation' id="references" style="height:auto"><br>
+							<span style="font-size:16px">References:</span><br><br>
+							<a id="ref_1"></a>[1] <a href="https://en.wikipedia.org/wiki/Allegory_of_the_cave">Allegory of the Cave</a>, Plato, c. 375 BC<br><br>
+							<a id="ref_2"></a>[2] <a href="">A Human-Level AGI</a>, OpenAI, 2025<br><br>
+						</div>
+		    </div>
+		    <div class="margin-right-block">
+            <!-- margin notes for reference block here -->
+		    </div>
+		</div>
+
+	</body>
+
+</html>
