@@ -11,230 +11,251 @@
     <link rel="shortcut icon" href="images/icon.ico" />
 
     <style type="text/css">
-      body {
-        background-color: #f5f9ff;
-      }
+		body {
+		background-color: #f5f9ff;
+		}
 
-      /* Hide both math displays initially, will display based on JS detection */
-      .mathjax-mobile,
-      .mathml-non-mobile {
-        display: none;
-      }
+		/* Hide both math displays initially, will display based on JS detection */
+		.mathjax-mobile,
+		.mathml-non-mobile {
+		display: none;
+		}
 
-      /* Show the MathML content by default on non-mobile devices */
-      .show-mathml .mathml-non-mobile {
-        display: block;
-      }
-      .show-mathjax .mathjax-mobile {
-        display: block;
-      }
+		/* Show the MathML content by default on non-mobile devices */
+		.show-mathml .mathml-non-mobile {
+		display: block;
+		}
+		.show-mathjax .mathjax-mobile {
+		display: block;
+		}
 
-      .content-margin-container {
-        display: flex;
-        width: 100%; /* Ensure the container is full width */
-        justify-content: left; /* Horizontally centers the children in the container */
-        align-items: center; /* Vertically centers the children in the container */
-      }
+		.content-margin-container {
+		display: flex;
+		width: 100%; /* Ensure the container is full width */
+		justify-content: left; /* Horizontally centers the children in the container */
+		align-items: center; /* Vertically centers the children in the container */
+		}
 
-      .main-content-block {
-        width: 70%; /* Change this percentage as needed */
-        max-width: 1100px; /* Optional: Maximum width */
-        background-color: #fff;
-        border-left: 1px solid #DDD;
-        border-right: 1px solid #DDD;
-        padding: 8px 8px 8px 8px;
-        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
-          Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
-      }
+		.main-content-block {
+		width: 70%; /* Change this percentage as needed */
+		max-width: 1100px; /* Optional: Maximum width */
+		background-color: #fff;
+		border-left: 1px solid #DDD;
+		border-right: 1px solid #DDD;
+		padding: 8px 8px 8px 8px;
+		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+			Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
+		}
 
-      .margin-left-block {
-        font-size: 14px;
-        width: 15%; /* Change this percentage as needed */
-        max-width: 130px; /* Optional: Maximum width */
-        position: relative;
-        margin-left: 10px;
-        text-align: left;
-        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
-          Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
-        padding: 5px;
-      }
+		.margin-left-block {
+		font-size: 14px;
+		width: 20%; /* Change this percentage as needed */
+		max-width: 130px; /* Optional: Maximum width */
+		position: relative;
+		margin-left: 10px;
+		text-align: left;
+		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+			Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
+		padding: 5px;
+		}
 
-      .margin-right-block {
-        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
-          Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
-        font-size: 14px;
-        width: 25%; /* Change this percentage as needed */
-        max-width: 256px; /* Optional: Maximum width */
-        position: relative;
-        text-align: left;
-        padding: 10px; /* Optional: Adds padding inside the caption */
-      }
+		.margin-right-block {
+		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+			Helvetica, Arial, "Lucida Grande", sans-serif, "Avenir";
+		font-size: 14px;
+		width: 20%; /* Change this percentage as needed */
+		max-width: 256px; /* Optional: Maximum width */
+		position: relative;
+		text-align: left;
+		padding: 10px; /* Optional: Adds padding inside the caption */
+		}
 
-      img {
-        max-width: 100%; /* Make sure it fits inside the container */
-        height: auto;
-        display: block;
-        margin: auto;
-      }
+		img {
+		max-width: 100%; /* Make sure it fits inside the container */
+		height: auto;
+		display: block;
+		margin: auto;
+		}
 
-      .my-video {
-        max-width: 100%; /* Make sure it fits inside the container */
-        height: auto;
-        display: block;
-        margin: auto;
-      }
+		.my-video {
+		max-width: 100%; /* Make sure it fits inside the container */
+		height: auto;
+		display: block;
+		margin: auto;
+		}
 
-      /* Hide both video displays initially, will display based on JS detection */
-      .vid-mobile,
-      .vid-non-mobile {
-        display: none;
-      }
+		/* Hide both video displays initially, will display based on JS detection */
+		.vid-mobile,
+		.vid-non-mobile {
+		display: none;
+		}
 
-      /* Show the video content by default on non-mobile devices */
-      .show-vid-mobile .vid-mobile {
-        display: block;
-      }
-      .show-vid-non-mobile .vid-non-mobile {
-        display: block;
-      }
+		/* Show the video content by default on non-mobile devices */
+		.show-vid-mobile .vid-mobile {
+		display: block;
+		}
+		.show-vid-non-mobile .vid-non-mobile {
+		display: block;
+		}
 
-      a:link,
-      a:visited {
-        color: #0e7862; /*#1367a7;*/
-        text-decoration: none;
-      }
-      a:hover {
-        color: #24b597; /*#208799;*/
-      }
+		a:link,
+		a:visited {
+		color: #0e7862; /*#1367a7;*/
+		text-decoration: none;
+		}
+		a:hover {
+		color: #24b597; /*#208799;*/
+		}
 
-      h1 {
-        font-size: 18px;
-        margin-top: 4px;
-        margin-bottom: 10px;
-      }
+		/* h1 {
+		font-size: 18px;
+		margin-top: 4px;
+		margin-bottom: 10px;
+		} */
 
-      table.header {
-        font-weight: 300;
-        font-size: 17px;
-        flex-grow: 1;
-        width: 70%;
-        max-width: calc(100% - 290px); /* Adjust according to the width of .paper-code-tab */
-      }
+		table.header {
+		font-weight: 300;
+		font-size: 17px;
+		flex-grow: 1;
+		width: 70%;
+		max-width: calc(100% - 290px); /* Adjust according to the width of .paper-code-tab */
+		}
 
-      table td,
-      table td * {
-        vertical-align: middle;
-        position: relative;
-      }
+		table td,
+		table td * {
+		vertical-align: middle;
+		position: relative;
+		}
 
-      table.paper-code-tab {
-        flex-shrink: 0;
-        margin-left: 8px;
-        margin-top: 8px;
-        padding: 0px 0px 0px 8px;
-        width: 290px;
-        height: 150px;
-      }
+		table.paper-code-tab {
+		flex-shrink: 0;
+		margin-left: 8px;
+		margin-top: 8px;
+		padding: 0px 0px 0px 8px;
+		width: 290px;
+		height: 150px;
+		}
 
-      .layered-paper {
-        /* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
-        box-shadow:
-          0px 0px 1px 1px rgba(0,0,0,0.35), /* The top layer shadow */
-          5px 5px 0 0px #fff, /* The second layer */
-          5px 5px 1px 1px rgba(0,0,0,0.35), /* The second layer shadow */
-          10px 10px 0 0px #fff, /* The third layer */
-          10px 10px 1px 1px rgba(0,0,0,0.35); /* The third layer shadow */
-        margin-top: 5px;
-        margin-left: 10px;
-        margin-right: 30px;
-        margin-bottom: 5px;
-      }
+		.layered-paper {
+		/* modified from: http://css-tricks.com/snippets/css/layered-paper/ */
+		box-shadow:
+			0px 0px 1px 1px rgba(0,0,0,0.35), /* The top layer shadow */
+			5px 5px 0 0px #fff, /* The second layer */
+			5px 5px 1px 1px rgba(0,0,0,0.35), /* The second layer shadow */
+			10px 10px 0 0px #fff, /* The third layer */
+			10px 10px 1px 1px rgba(0,0,0,0.35); /* The third layer shadow */
+		margin-top: 5px;
+		margin-left: 10px;
+		margin-right: 30px;
+		margin-bottom: 5px;
+		}
 
-      hr {
-        height: 1px; /* Sets the height of the line to 1 pixel */
-        border: none; /* Removes the default border */
-        background-color: #DDD; /* Sets the line color to black */
-      }
+		hr {
+		height: 1px; /* Sets the height of the line to 1 pixel */
+		border: none; /* Removes the default border */
+		background-color: #DDD; /* Sets the line color to black */
+		}
 
-      div.hypothesis {
-        width: 80%;
-        background-color: #EEE;
-        border: 1px solid black;
-        border-radius: 10px;
-        -moz-border-radius: 10px;
-        -webkit-border-radius: 10px;
-        font-family: Courier;
-        font-size: 18px;
-        text-align: center;
-        margin: auto;
-        padding: 16px 16px 16px 16px;
-      }
+		div.hypothesis {
+		width: 80%;
+		background-color: #EEE;
+		border: 1px solid black;
+		border-radius: 10px;
+		-moz-border-radius: 10px;
+		-webkit-border-radius: 10px;
+		font-family: Courier;
+		font-size: 18px;
+		text-align: center;
+		margin: auto;
+		padding: 16px 16px 16px 16px;
+		}
 
-      div.citation {
-        font-size: 0.8em;
-        background-color:#fff;
-        padding: 10px;
-        height: 200px;
-      }
+		div.citation {
+		font-size: 0.8em;
+		background-color:#fff;
+		padding: 10px;
+		height: 200px;
+		}
 
-      .fade-in-inline {
-        position: absolute;
-        text-align: center;
-        margin: auto;
-        -webkit-mask-image: linear-gradient(to right,
-          transparent 0%,
-          transparent 40%,
-          black 50%,
-          black 90%,
-          transparent 100%);
-        mask-image: linear-gradient(to right,
-          transparent 0%,
-          transparent 40%,
-          black 50%,
-          black 90%,
-          transparent 100%);
-        -webkit-mask-size: 8000% 100%;
-        mask-size: 8000% 100%;
-        animation-name: sweepMask;
-        animation-duration: 4s;
-        animation-iteration-count: infinite;
-        animation-timing-function: linear;
-        animation-delay: -1s;
-      }
+		.fade-in-inline {
+		position: absolute;
+		text-align: center;
+		margin: auto;
+		-webkit-mask-image: linear-gradient(to right,
+			transparent 0%,
+			transparent 40%,
+			black 50%,
+			black 90%,
+			transparent 100%);
+		mask-image: linear-gradient(to right,
+			transparent 0%,
+			transparent 40%,
+			black 50%,
+			black 90%,
+			transparent 100%);
+		-webkit-mask-size: 8000% 100%;
+		mask-size: 8000% 100%;
+		animation-name: sweepMask;
+		animation-duration: 4s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+		animation-delay: -1s;
+		}
 
-      .fade-in2-inline {
-        animation-delay: 1s;
-      }
+		.fade-in2-inline {
+		animation-delay: 1s;
+		}
 
-      .inline-div {
-        position: relative;
-        display: inline-block; /* Makes both the div and paragraph inline-block elements */
-        vertical-align: top; /* Aligns them at the top, you can adjust this to middle, bottom, etc., based on your needs */
-        width: 50px; /* Optional: Adds space between the div and the paragraph */
-      }
+		.inline-div {
+		position: relative;
+		display: inline-block; /* Makes both the div and paragraph inline-block elements */
+		vertical-align: top; /* Aligns them at the top, you can adjust this to middle, bottom, etc., based on your needs */
+		width: 50px; /* Optional: Adds space between the div and the paragraph */
+		}
 
-      /* --- Optional section polish (no text/images removed) --- */
-      .section-title {
-        font-size: 20px;
-        letter-spacing: 0.2px;
-        margin-top: 10px;
-      }
+		/* --- Optional section polish (no text/images removed) --- */
+		.section-title {
+		font-size: 20px;
+		letter-spacing: 0.2px;
+		margin-top: 10px;
+		}
 
-      .section-subtitle {
-        font-size: 16px;
-        margin-top: 14px;
-      }
+		.section-subtitle {
+		font-size: 16px;
+		margin-top: 14px;
+		}
 
-      .section-divider {
-        height: 1px;
-        border: none;
-        background-color: #e6e6e6;
-        margin: 18px 0;
-      }
+		.section-divider {
+		height: 1px;
+		border: none;
+		background-color: #e6e6e6;
+		margin: 18px 0;
+		}
 
-      .main-content-block p {
-        line-height: 1.45;
-      }
+		.main-content-block p {
+		line-height: 1.45;
+		}
+
+		.img-row {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 20px; /* space between the two images */
+			margin-bottom: 20px;
+		}
+
+		.img-row img {
+			width: 512px;
+		}
+
+		.img-center {
+			text-align: center;
+			margin-top: 10px;
+		}
+
+		.img-center img {
+			width: 512px;
+		}
     </style>
   </head>
 
@@ -289,15 +310,7 @@
           <a href="#conclusion">Conclusion</a><br><br>
         </div>
       </div>
-
-      <div class="main-content-block">
-        <!--You can embed an image like this:-->
-        <img src="./images/your_image_here.png" width="512px" />
-      </div>
-
-      <div class="margin-right-block">
-        Caption for the image.
-      </div>
+	  
     </div>
 
     <!-- Introduction and Background text block
@@ -356,11 +369,19 @@
           First, we replicated the results of the Huh et al. (2024) paper and confirmed that the alignment from LLMs to DINOv2 increases as the performance of the LLMs increases. We also plotted the alignment from LLMs to non-ViT vision models, against the performance of LLMs, and found that this correlation pattern is consistent.
         </p>
 
-        <img src="./images/langperf_dinoalign.png" width="512px" />
-        <img src="./images/lang_vs_alignment_CLIP.png" width="512px" />
-        <img src="./images/lang_vs_alignment_MAE.png" width="512px" />
-        <img src="./images/langperf_gptalign.png" width="512px" />
-        <img src="./images/lang_vs_alignment_diffusion.png" width="512px" />
+		<div class="img-row">
+			<img src="./images/langperf_dinoalign.png" />
+			<img src="./images/lang_vs_alignment_CLIP.png" />
+		</div>
+
+		<div class="img-row">
+			<img src="./images/lang_vs_alignment_MAE.png" />
+			<img src="./images/langperf_gptalign.png" width="512px" />
+		</div>
+
+		<div class="img-center">
+			<img src="./images/lang_vs_alignment_diffusion.png" width="512px" />
+		</div>
 
         <p>
           We also plotted ViT alignment to the language model LLaMA-13B (Touvron et al. (2023)) across ViT performance. We found a strong correlation between model alignment and vision performance.
@@ -420,40 +441,247 @@
         </p>
 
         <img src="./images/vit_performance_vs_alignment_diffusion.png" width="512px" />
+
+		<p>
+			However, in this second graph displayed below, we observe the inverse relationship, where the alignment score between ImageGPT and diffusion models decreased as ImageGPT performance increased. Although this was an unexpected result, we do notice how the alignment scores between diffusion and ImageGPT models were higher for larger ImageGPT models than smaller models, which remains consistent with the findings from Huh et al. (2024).
+		</p>
+
+		<img src="./images/imggpt_performance_vs_alignment_diffusion.png" width="512px" />
+		
+		<p>
+			In the final graph, we observe nearly zero correlation between the performance scores of the ViT models and their alignment to the ImageGPT models. While this result was also unexpected and inconsistent with the findings from Huh et al. (2024), similar to the second graph, we observe that alignment scores are higher with larger ImageGPT models. Thus, we still find that larger models show more convergence. 
+		</p>
+
+		<img src="./images/imggpt_performance_vs_alignment_vit.png" width="512px" />
+
+		<h2>Discussion</h2>
+
+		<p>
+			In the results above, we see that representations in ViT and diffusion models appear to align more than representations of either model with ImageGPT models. We attribute this difference in alignment to the architecture differences between models. Although ViT employs a decoder-only transformer and a diffusion model uses a noising and de-noising process, both models aim to capture high-level features of the image and determine the semantic structure. In contrast, ImageGPT models use an encoder-only transformer that focuses on  capturing low-level features of an image that aids it in its primary task of next-pixel prediction. The differences in their architectures and objectives could likely explain why ViT and diffusion models share higher alignment scores.
+		</p>
+
+		<p>
+			We observed also that larger ImageGPT models shared higher alignment scores with diffusion and ViT models than smaller ImageGPT models. We theorize that this is due to larger ImageGPT models having more layers that allow them to capture more complex features, making the representation they learn converge more with the representations of ViT and diffusion models. 
+		</p>
+
+		<p>
+			This reasoning is in line with the Capacity Hypothesis introduced in Huh et al. (2024), which suggests that larger models are more likely than smaller models to converge to a shared representation because larger models are more effective at finding an optimal representation.
+		</p>
       </div>
 
       <div class="margin-right-block"></div>
     </div>
 
-    <!-- Invisible anchor targets so Outline links work (no visible content) -->
-    <div id="layers"></div>
-    <div id="conclusion"></div>
-
-    <!-- Implications and limitations -->
-    <div class="content-margin-container" id="implications_and_limitations">
+	<!-- Representational Similarity Across Layers -->
+    <div class="content-margin-container" id="layers">
       <div class="margin-left-block"></div>
 
       <div class="main-content-block">
-        <h1>Implications and limitations</h1>
-        Let's end with some discussion of the implications and limitations.
+        <h1>Representational Similarity Across Layers</h1>
+
+		<h2>Hypothesis and Motivation</h2>
+
+		<p>
+			While previous literature provides evidence for representational similarity across modalities and architectures, the evolution of convergence across the layers of a model is less explored. Whether convergence emerges in early, middle, or late layers gives insight into what factors could be driving model convergence: is it shared input statistics, universal optimal latent representations, or a common goal? Recently, Kapoor et al. (2025) compared the layer alignments of many convolutional networks (ResNets, VGGs, AlexNets) and found that for randomly seeded models with the same architecture, earlier layers were more strongly aligned to each other than later layers, a trend they attributed to earlier layers capturing more systematic components of images and later layers more task-specific features. Another recent study claims that like CNNs, ViTs also encode increasingly complex concepts in deeper layers. Thus, we might expect that ViTs would also have earlier layers which are more aligned to each other than later layers.
+		</p>
+
+		<p>
+			We can also ask this question across architectures. Previous studies such as Raghu et al. (2022) have compared different vision architectures such as ViTs and CNNs, specifically ResNets. They found that the layers of a ViT exhibit uniform alignment across the model, in contrast to ResNets that exhibit strong locality, where earlier layers align closely with neighboring layers and much less with later layers. When comparing layer representations between the two architectures, they observed that approximately the first half of ResNet layers correspond to approximately the first quarter of ViT layers; in other words, a ResNet requires more layers to reach the same level of representation. Overall, these findings suggest that ViT layers hold more uniform representations than ResNet layers, despite the residual skip connections of ResNets.
+		</p>
+
+		<p>
+			Another open question is how well layers from models of different modalities align with each other. Choraria et al. (2024) compared two models, a CLIP based ViT and the Flan-T5-Base language model, and found that for both models, layers showed the most alignment to the opposite model’s final layers. This suggests that perhaps both models are taking different computational approaches to arrive at the same platonic representation. Here, we test whether this holds true for a class of transformer-based language models and both ViT and GPT-based vision models.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>
+			To test the layer alignments of a class of models to a candidate model, we computed kernels for each model layer and calculated (1) which layer of the candidate model aligned most per layer and (2) the resulting optimal alignment scores. By graphing the best fitting layer of the candidate model across layers of models in the model class, we can see how the most similar candidate model layer evolves through the layers of the models in the model class. By graphing optimal alignment to the candidate model across layers of the model class models, we can see whether convergence occurs early, in the middle, or late in the network. 
+		</p>
+
+		<h2>Results</h2>
+
+		<h3>Within ViTs</h3>
+
+		<p>
+			First, we compare DINOv2 with other ViT models. Like Kapoor et al. (2025)’s analysis on CNNs, we find that layers are most closely aligned with neighboring layers; the corresponding DINOv2 layer that best aligns with a ViT layer tracks closely with its depth in the model, with the exception of AugReg which plateaus at layer 25 of DINOv2. However, in contrast to findings on CNNs, we find that layer alignment scores do not decrease throughout the model, but instead seem to initially increase and then stay constant at a relatively high alignment score around 0.4. These findings do not contradict previous findings that deeper layers of the ViT encode increasingly complex concepts; such layers could hold complex concepts that share similar as opposed to increasingly distinct representations.
+		</p>
+
+		<div class="img-row">
+			<img src="./images/vitlayer_dinoalign_ind.png" width="512px" />
+			<img src="./images/vitlayer_dinoalign.png" width="512px" />
+		</div>
+
+		<h3>Across Different Vision Architectures</h3>
+
+		<p>
+			Next, we apply the same comparison across different vision architectures, namely ViTs and ImageGPT. Although both use transformers, ViTs employ bidirectional attention for representation learning over patches, whereas ImageGPT uses autoregressive causal attention to predict future pixels.
+		</p>
+
+		<p>
+			We compare ImageGPT-large layers with ViT models and find that early layers ViT models align best with early layers of ImageGPT-large. However, at around 20% layer depth, ViT layers plateau in their preferred ImageGPT-large layer and are most similar to around layer 20 of ImageGPT-large, no matter the ViT layer depth. Alignment scores also show minimal trends, oscillating roughly between 0.15 and 0.30.
+		</p>
+
+		<p>
+			One explanation for these trends is that initially, both models are moving towards a shared platonic representation. However, after layer 20, ImageGPT-large begins to diverge from this representation, while ViT models continue to move closer. This would explain why ImageGPT and ViT layers are initially most closely aligned to layers of corresponding depth, until layer 20 is reached, at which point it becomes the most similar ImageGPT layer to each successive ViT layer. Chen et al. (2020), which finds that layer 20 of ImageGPT-large has the highest representation quality, supports this conjecture.
+		</p>
+
+		<div class="img-row">
+			<img src="./images/vitlayer_gptalign_ind.png" width="512px" />
+			<img src="./images/vitlayer_gptalign.png" width="512px" />
+		</div>
+
+		<h3>Across Different Modalities</h3>
+
+		<p>
+			Finally, we examine across modality layer-by-layer comparisons. When comparing DINOv2 layers with LLM models, we find that all layers of an LLM model, no matter the depth, are mostly similar to late layers of DINOv2. We also find that alignment score increases across layers, with a slight decrease in the last LLM layer.
+		</p>
+
+		<div class="img-row">
+			<img src="./images/llmlayer_dinoalign_ind.png" width="512px" />
+			<img src="./images/llmlayer_dinoalign.png" width="512px" />
+		</div>
+
+		<p>
+			Comparing ImageGPT-large layers with LLM layers shows similar patterns of increasing alignment across layers with a slight decrease in the last layer, although overall magnitude of alignment is much lower than when comparing DINOv2 and LLM layers. However, all LLM layers align best with a middle layer (layer 20) of the ImageGPT-large model – which, as seen in the previous section, is also the layer that ViT layers most strongly align with. This differs from the DINOv2 and LLM layer alignment results, where all LLM layers instead are aligned to late layers of DINOv2. 
+		</p>
+
+		<div class="img-row">
+			<img src="./images/llmlayer_gptalign_ind.png" width="512px" />
+			<img src="./images/llmlayer_gptalign.png" width="512px" />
+		</div>
+
+		<p>
+			When comparing LLaMA-13B layers with ViT models, we find that all layers of a ViT model, no matter the depth, are similar to the last quarter of LLaMA-13B layers. Alignment scores start low but increase gradually, accelerating in the second half of model layers.
+		</p>
+
+		<div class="img-row">
+			<img src="./images/vitlayer_llamaalign_ind.png" width="512px" />
+			<img src="./images/vitlayer_llamaalign.png" width="512px" />
+		</div>
+
+		<p>
+			With all three cross-modality comparisons, we see the same trend that all layers of all models in one modality tend to align best with a small subset of layers of the other-modality model, with no dependence on layer depth. Furthermore, alignment scores increase across layers, which is compatible with the hypothesis that model convergence is driven by shared goals and optimal latent representations, rather than shared input statistics.
+		</p>
+
+		<h2>Discussion</h2>
+
+		<p>
+			Our layer analyses reveal that (1) unlike CNNs, transformer representations don’t diverge at deeper layers, (2) several models have distinctive, rather than uniform, layers that align well with many other models, (3) and cross-modal alignment increases with layer depth.
+		</p>
+
+		<p>
+			Overall, analyzing alignment across model layers reveals how representations in models of different architectures and modalities may be evolving towards a shared platonic representation. The non-decreasing changes in alignment across layers implies that a shared platonic representation is likely not due to shared input statistics, but rather a shared goal or optimal latent representation. Our analyses on LLMs, ViTs, and ImageGPT generate candidates for layers which are closest to a platonic representation, most notably layer 20 of ImageGPT-large. We also show that unlike CNNs, transformer representations don’t diverge at deeper layers. 
+		</p>
+
+		<p>
+			Our analyses above suggest that representations move closer or farther from a platonic representation as they pass through layers. Figure XX is a simplified hypothesis of how our tested models may be moving in relation to a platonic representation (PR). Since both ViTs and LLMs are always moving closer to PR, the best aligning layer for all layers of a model is the last layer of the opposing model, and layer alignment scores increase with depth. As layer 20 of image-GPT is its closest to PR, all layers of ViT and LLM models align best to it, with alignment scores increasing or plateauing with layer depth. 
+		</p>
+
+		<img src="./images/Layer hypothesis diagram.png" width="512px" />
+      </div>
+
+      <div class="margin-right-block"></div>
+    </div>
+
+	<!-- Conclusion -->
+    <div class="content-margin-container" id="conclusion">
+      <div class="margin-left-block"></div>
+
+      <div class="main-content-block">
+        <h1>Conclusion</h1>
+        
+		<h2>Implications</h2>
+
+		<p>
+			We found that alignment between models is independent of modality and increases with performance of the model, indicating that there is representational similarity across modalities. In comparing alignment scores across different vision model architectures, we observed that, generally, higher performing models also had higher alignment scores, suggesting that the models are extracting higher-level features from the input image. Finally, analyzing alignment on a model layer level offers a window into how representations across architectures and modalities evolve through depth and approach a shared platonic representation. These findings provide evidence that the Platonic Representation Hypothesis extends beyond the limited cases tested in Huh et al. (2024). The convergence of representations across language and vision models brings hope of more robust models and more seamless integration across different models, although it also introduces the concern of whether universal representations may also universalize biases in models.
+		</p>
+
+		<h2>Limitations and Future Work</h2>
+
+		<p>
+			We established that the Platonic Representation Hypothesis holds true across different modalities, specifically with language and vision. However, we did not generalize our methods and findings to modalities such as audio or robotics, which present challenges in kernel representation and cross-modal data acquisition. For audio model representations, it is difficult to compute the distance between different data points because of the inherent temporal nature of the data as well as the data’s different semantic categories, such as speech content (“a bell is ringing”) or sound events (the sound of a bell ringing). For robotics models like Vision-Language-Action (VLA) models, it is difficult to define a similarity metric between actions in the robot’s action space, since they are so context-dependent. In addition, for both audio and robotics models, there is very little cross-modal data compared to language-vision datasets.
+		</p>
+
+		<p>
+			While we observed high representational alignment across vision models with different architectures, we did not observe if the same trends are present in different model types such as audio models. Additionally, within vision models, we did not test on all vision model architectures such as CNNs. The models we used were also pre-trained models; future works could consider how alignment scores would evolve during training or fine-tuning. 
+		</p>
+
+		<p>
+			Our layer level analysis has several limitations that suggest directions for future work. For example, layer-by-layer comparisons implicitly adopt a feed-forward notion of depth that may be unfair to modern transformers. In transformers, most computation is mediated through a shared residual stream, with attention and MLP blocks providing incremental updates rather than completely new representations. As a result, “layer index” may misrepresent information that is distributed across different attention heads. Future work could develop layer comparisons between transformers and other models that more accurately capture the flow of information in transformer architectures. Finally, these results are correlational: high alignment does not guarantee that models implement the same computation, and different input distributions or multimodal protocols might highlight different convergence patterns. Future work could employ more causal tests, such as by testing whether aligned layers are functionally interchangeable by swapping or projecting representations between models and evaluating whether this preserves task performance.
+		</p>
       </div>
 
       <div class="margin-right-block"></div>
     </div>
 
     <!-- Citations -->
-    <div class="content-margin-container" id="citations">
-      <div class="margin-left-block"></div>
+	<div class="content-margin-container" id="citations">
+	<div class="margin-left-block"></div>
 
-      <div class="main-content-block">
-        <div class="citation" id="references" style="height:auto"><br>
-          <span style="font-size:16px">References:</span><br><br>
-          <a id="ref_1"></a>[1]
-          <a href="https://en.wikipedia.org/wiki/Allegory_of_the_cave">Allegory of the Cave</a>, Plato, c. 375 BC<br><br>
-          <a id="ref_2"></a>[2]
-          <a href="">A Human-Level AGI</a>, OpenAI, 2025<br><br>
-        </div>
-      </div>
+	<div class="main-content-block">
+		<div class="citation" id="references" style="height:auto"><br>
+		<span style="font-size:16px">References:</span><br><br>
+
+		<a id="ref_1"></a>[1]
+		Choraria, M., Wu, X., Basu, S., Sekhar, N., Wu, Y., Zhang, X., Singhal, P., & Varshney, L. R. (2024).
+		<i>Semantically grounded QFormer for efficient vision language understanding.</i>
+		arXiv preprint arXiv:2311.07449.<br><br>
+
+		<a id="ref_2"></a>[2]
+		Chen, M., Radford, A., Child, R., Wu, J., Jun, H., Luan, D., & Sutskever, I. (2020).
+		<i>Generative pretraining from pixels.</i>
+		In Proceedings of the 37th International Conference on Machine Learning (ICML).<br><br>
+
+		<a id="ref_3"></a>[3]
+		He, Z. W., Trott, S., & Khosla, M. (2025).
+		<i>Seeing Through Words, Speaking Through Pixels: Deep representational alignment between vision and language models.</i>
+		In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing.
+		https://doi.org/10.18653/v1/2025.emnlp-main.1806<br><br>
+
+		<a id="ref_4"></a>[4]
+		Huh, M., Cheung, B., Wang, T., & Isola, P. (2024).
+		<i>Position: The Platonic Representation Hypothesis.</i>
+		In Proceedings of the 41st International Conference on Machine Learning (ICML).<br><br>
+
+		<a id="ref_5"></a>[5]
+		Jassim, S., Holubar, M., Richter, A., Wolff, C., Ohmer, X., & Bruni, E. (2023).
+		<i>GRASP: A novel benchmark for evaluating language GRounding And Situated Physics understanding in multimodal language models.</i>
+		arXiv preprint arXiv:2311.09048.<br><br>
+
+		<a id="ref_6"></a>[6]
+		Kapoor, S., Srivastava, N., & Khosla, M. (2025).
+		<i>Bridging critical gaps in convergent learning: How representational alignment evolves across layers, training, and distribution shifts.</i>
+		arXiv preprint arXiv:2502.18710.<br><br>
+
+		<a id="ref_7"></a>[7]
+		Merullo, J., Castricato, L., Eickhoff, C., & Pavlick, E. (2022).
+		<i>Linearly mapping from image to text space.</i>
+		arXiv preprint arXiv:2209.15162.<br><br>
+
+		<a id="ref_8"></a>[8]
+		Raghu, M., Unterthiner, T., Kornblith, S., Zhang, C., & Dosovitskiy, A. (2021).
+		<i>Do vision transformers see like convolutional neural networks?</i>
+		In Advances in Neural Information Processing Systems.<br><br>
+
+		<a id="ref_9"></a>[9]
+		Riochet, R., Sivic, J., Laptev, I., & Dupoux, E. (2020).
+		<i>Occlusion resistant learning of intuitive physics from videos.</i>
+		arXiv preprint arXiv:2005.00069.<br><br>
+
+		<a id="ref_10"></a>[10]
+		Touvron, H., Lavril, T., Izacard, G., Martinet, X., Lachaux, M.-A., Lacroix, T., Rozière, B., Goyal, N., Hambro, E., Azhar, F., Rodriguez, A., Joulin, A., Grave, E., & Lample, G. (2023).
+		<i>LLaMA: Open and efficient foundation language models.</i>
+		arXiv preprint arXiv:2302.13971.<br><br>
+
+		<a id="ref_11"></a>[11]
+		Wallin, T. (2022).
+		<i>Structural comparison of data representations obtained from deep learning models</i> (Master’s thesis).
+		KTH Royal Institute of Technology.<br><br>
+
+		</div>
+	</div>
+	</div>
 
       <div class="margin-right-block">
         <!-- margin notes for reference block here -->
